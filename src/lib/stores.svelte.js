@@ -1,4 +1,4 @@
-/** @typedef {{ date_iso: string|null, date_formatted: string, subject: string, amount: number|null, reference: string|null, status: string, snippet: string }} Transaction */
+/** @typedef {{ date_iso: string|null, date_formatted: string, subject: string, amount: number|null, reference: string|null, status: string, business: string|null, snippet: string }} Transaction */
 /** @typedef {{ email_account: string, sender: string, generated_at: string, total_fetched: number, total_approved: number, total_unique: number, transactions: Transaction[] }} ReportData */
 
 import { processAllMessages } from './gmail.js'
@@ -114,20 +114,6 @@ export function signOut() {
 }
 
 // ---------- Data loading ----------
-export async function loadStaticData() {
-  reportState.loading = true
-  reportState.error = null
-  try {
-    const res = await fetch('/transacciones.json')
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    reportState.data = await res.json()
-  } catch (e) {
-    reportState.error = e.message
-  } finally {
-    reportState.loading = false
-  }
-}
-
 export async function fetchFromGmail() {
   if (!authState.accessToken) {
     reportState.error = 'No autenticado'
@@ -166,4 +152,20 @@ export async function fetchFromGmail() {
 // ---------- Utilities ----------
 export function fmtNum(n) {
   return n.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+// ---------- Offline / Demo ----------
+export async function loadStaticData() {
+  if (reportState.data) return
+  reportState.loading = true
+  try {
+    const res = await fetch('/transacciones.json')
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const data = await res.json()
+    reportState.data = data
+  } catch (e) {
+    reportState.error = 'No se pudieron cargar los datos offline'
+  } finally {
+    reportState.loading = false
+  }
 }

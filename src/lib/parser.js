@@ -2,7 +2,7 @@
 
 const RE_AMOUNT = /(?:\$\s?[\d.,]+|COP\s?[\d.,]+|[\d.,]+\s?COP|USD\s?[\d.,]+|[\d.,]+\s?USD)/i
 
-const RE_REFERENCE = /(?:(?:referencia|ref|reference|transacci[oó]n|transaction|ticket|recibo|receipt|CUS|id)[\s:#.\-]*)([A-Za-z0-9\-]{4,30})/i
+const RE_REFERENCE = /(?:(?:referencia|ref\.?|reference|transacci[oó]n|transaction|ticket|recibo|receipt|CUS|id)[\s:#.\-]+)([A-Za-z0-9]{4,30})/i
 
 const STATUS_MAP = [
   ['aprobad', 'Aprobada'],
@@ -122,6 +122,14 @@ export function parseReference(text) {
   return match ? match[1] : ''
 }
 
+const RE_BUSINESS = /(?:empresa|comercio|establecimiento|business)[\s:]+([^\n\r]+?)(?=\s*(?:valor|monto|cantidad|moneda|detalle|ref\.?|referencia|estado|tipo|transaction|payment|$))/i
+
+export function parseBusiness(text) {
+  const match = RE_BUSINESS.exec(text)
+  if (match) return match[1].trim().substring(0, 80)
+  return null
+}
+
 export function detectStatus(text) {
   const lower = text.toLowerCase()
   for (const [keyword, status] of STATUS_MAP) {
@@ -149,6 +157,7 @@ export function parseTransaction(msg) {
   const amount = parseAmount(combined)
   const reference = parseReference(combined)
   const status = detectStatus(combined)
+  const business = parseBusiness(combined)
 
   let date_iso = null
   let date_formatted = msg.date_str || ''
@@ -164,6 +173,7 @@ export function parseTransaction(msg) {
     amount,
     reference: reference || null,
     status,
+    business,
     snippet: (msg.snippet || '').substring(0, 300),
   }
 }

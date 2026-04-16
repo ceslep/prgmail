@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  import { getReportState, getAuth, loadStaticData, initGoogleAuth, loadRemoteCredentials } from './lib/stores.svelte.js'
+  import { getReportState, getAuth, initGoogleAuth, loadRemoteCredentials, loadStaticData } from './lib/stores.svelte.js'
   import { exportToPdf } from './lib/pdfExport.js'
   import Header from './lib/Header.svelte'
   import AuthPanel from './lib/AuthPanel.svelte'
@@ -9,6 +9,7 @@
   import MonthlyChart from './lib/MonthlyChart.svelte'
   import Filters from './lib/Filters.svelte'
   import TransactionTable from './lib/TransactionTable.svelte'
+  import PdfPreviewModal from './lib/PdfPreviewModal.svelte'
 
   const report = getReportState()
   const auth = getAuth()
@@ -22,14 +23,14 @@
   let sortKey = $state('date')
   let sortAsc = $state(false)
   let exporting = $state(false)
+  let showPdfPreview = $state(false)
 
   onMount(async () => {
-    // Load credentials from remote server
     await loadRemoteCredentials()
-    // Init Google Auth with loaded or saved client ID
     initGoogleAuth()
-    // Load static JSON as fallback data
-    loadStaticData()
+    if (!report.data) {
+      await loadStaticData()
+    }
   })
 
   let transactions = $derived(report.data?.transactions ?? [])
@@ -89,14 +90,19 @@
     statusFilter = ''
   }
 
-  async function handleExport() {
+  function handleExport() {
+    showPdfPreview = true
+  }
+
+  async function handleDownloadPdf() {
     exporting = true
     try {
-      await exportToPdf('report-content', 'informe-financiero.pdf')
+      await exportToPdf({ report: report.data, transactions: filtered })
     } catch (e) {
       console.error('PDF export error:', e)
     } finally {
       exporting = false
+      showPdfPreview = false
     }
   }
 </script>
@@ -184,3 +190,11 @@
     Informe generado desde Gmail API &nbsp;|&nbsp; pgmail
   </footer>
 {/if}
+
+<PdfPreviewModal
+  open={showPdfPreview}
+  report={report.data}
+  transactions={filtered}
+  onclose={() => showPdfPreview = false}
+  ondownload={handleDownloadPdf}
+/>
