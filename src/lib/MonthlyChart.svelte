@@ -10,8 +10,8 @@
       map[month] = (map[month] || 0) + t.amount
     }
     return Object.entries(map)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .slice(-12) // last 12 months
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .slice(0, 12) // most recent 12 months, descending
   })
 
   let maxAmount = $derived(Math.max(...monthlyData.map(([, v]) => v), 1))

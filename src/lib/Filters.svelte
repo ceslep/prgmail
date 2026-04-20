@@ -25,8 +25,7 @@
         <input
           id="f-search"
           type="text"
-          value={search}
-          oninput={(e) => search = e.target.value}
+          bind:value={search}
           placeholder="Asunto, referencia..."
           class="w-full pl-9 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/25 transition-all"
         />
@@ -39,8 +38,7 @@
       <input
         id="f-datefrom"
         type="date"
-        value={dateFrom}
-        oninput={(e) => dateFrom = e.target.value}
+        bind:value={dateFrom}
         class="px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-200 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/25 transition-all [color-scheme:dark]"
       />
     </div>
@@ -51,8 +49,7 @@
       <input
         id="f-dateto"
         type="date"
-        value={dateTo}
-        oninput={(e) => dateTo = e.target.value}
+        bind:value={dateTo}
         class="px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-200 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/25 transition-all [color-scheme:dark]"
       />
     </div>
@@ -63,8 +60,7 @@
       <input
         id="f-amtmin"
         type="number"
-        value={amountMin}
-        oninput={(e) => amountMin = e.target.value}
+        bind:value={amountMin}
         placeholder="0"
         class="px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/25 transition-all"
       />
@@ -76,8 +72,7 @@
       <input
         id="f-amtmax"
         type="number"
-        value={amountMax}
-        oninput={(e) => amountMax = e.target.value}
+        bind:value={amountMax}
         placeholder="999999"
         class="px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/25 transition-all"
       />
@@ -88,12 +83,11 @@
       <label for="f-status" class="text-[11px] text-gray-500 uppercase tracking-wider font-medium">Estado</label>
       <select
         id="f-status"
-        value={statusFilter}
-        onchange={(e) => statusFilter = e.target.value}
+        bind:value={statusFilter}
         class="px-3 py-2.5 bg-white/5 border border-white/10 rounded-xl text-sm text-gray-200 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/25 transition-all appearance-none"
       >
         <option value="">Todos</option>
-        {#each statuses as s}
+        {#each statuses as s (s)}
           <option value={s}>{s}</option>
         {/each}
       </select>

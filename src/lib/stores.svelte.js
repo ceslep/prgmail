@@ -51,7 +51,7 @@ export async function loadRemoteCredentials() {
 // ---------- Preferences (persisted) ----------
 let preferences = $state({
   clientId: localStorage.getItem('pgmail_clientId') || '',
-  senderQuery: localStorage.getItem('pgmail_senderQuery') || 'from:info@pasarelapagosaval.com',
+  senderQuery: localStorage.getItem('pgmail_senderQuery') || 'from:info@pasarelapagosaval.com OR from:no-responder@avalpaycenter.com.co',
 })
 export function getPreferences() { return preferences }
 
@@ -88,6 +88,8 @@ export function initGoogleAuth() {
         .then(r => r.json())
         .then(p => { authState.email = p.emailAddress })
         .catch(() => {})
+      // Auto-fetch emails after sign-in
+      fetchFromGmail()
     },
   })
   return true

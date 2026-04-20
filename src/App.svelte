@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  import { getReportState, getAuth, initGoogleAuth, loadRemoteCredentials, loadStaticData } from './lib/stores.svelte.js'
+  import { getReportState, getAuth, initGoogleAuth, loadRemoteCredentials } from './lib/stores.svelte.js'
   import { exportToPdf } from './lib/pdfExport.js'
   import Header from './lib/Header.svelte'
   import AuthPanel from './lib/AuthPanel.svelte'
@@ -28,9 +28,6 @@
   onMount(async () => {
     await loadRemoteCredentials()
     initGoogleAuth()
-    if (!report.data) {
-      await loadStaticData()
-    }
   })
 
   let transactions = $derived(report.data?.transactions ?? [])
@@ -38,8 +35,8 @@
 
   let filtered = $derived.by(() => {
     const s = search.toLowerCase()
-    const minAmt = parseFloat(amountMin) || 0
-    const maxAmt = parseFloat(amountMax) || Infinity
+    const minAmt = (amountMin != null && amountMin !== '') ? Number(amountMin) : 0
+    const maxAmt = (amountMax != null && amountMax !== '') ? Number(amountMax) : Infinity
 
     let result = transactions.filter(t => {
       const dateStr = (t.date_iso || '').substring(0, 10)
@@ -147,9 +144,9 @@
       {/if}
 
       {#if report.data}
-        <HighlightCards {transactions} />
-        <StatusCards {transactions} />
-        <MonthlyChart {transactions} />
+        <HighlightCards transactions={filtered} />
+        <StatusCards transactions={filtered} />
+        <MonthlyChart transactions={filtered} />
 
         <h3 class="text-lg font-semibold text-gray-200 mb-4">Detalle de Transacciones</h3>
         <Filters

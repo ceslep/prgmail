@@ -100,19 +100,18 @@ export async function processAllMessages(token, query, onProgress = () => {}) {
     transactions.push(tx)
   }
 
-  // Phase 4: Filter approved
-  const approved = transactions.filter(t => t.status === 'Aprobada')
-
-  // Phase 5: Dedup by date_iso
+  // Phase 4: Dedup by date (minute-precision) + amount
   const seen = new Set()
   const unique = []
-  for (const t of approved) {
-    if (t.date_iso && seen.has(t.date_iso)) continue
-    if (t.date_iso) seen.add(t.date_iso)
+  for (const t of transactions) {
+    const dateMin = t.date_iso ? t.date_iso.substring(0, 16) : null // "YYYY-MM-DDTHH:MM"
+    const key = dateMin ? `${dateMin}|${t.amount}` : null
+    if (key && seen.has(key)) continue
+    if (key) seen.add(key)
     unique.push(t)
   }
 
-  // Phase 6: Sort by date desc
+  // Phase 5: Sort by date desc
   unique.sort((a, b) => (b.date_iso || '').localeCompare(a.date_iso || ''))
 
   const now = new Date()
@@ -124,7 +123,7 @@ export async function processAllMessages(token, query, onProgress = () => {}) {
     sender: query,
     generated_at: generated,
     total_fetched: totalMsgs,
-    total_approved: approved.length,
+    total_approved: unique.filter(t => t.status === 'Aprobada').length,
     total_unique: unique.length,
     transactions: unique,
   }

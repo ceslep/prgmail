@@ -82,11 +82,11 @@
           <tr class="border-b border-white/10 bg-white/[0.02]">
             <th class={thClass} onclick={() => onsort('index')}>#{arrow('index')}</th>
             <th class={thClass} onclick={() => onsort('date')}>Fecha{arrow('date')}</th>
+            <th class="{thClass} cursor-default hover:text-gray-500">Detalle</th>
             <th class={thClass} onclick={() => onsort('subject')}>Asunto{arrow('subject')}</th>
             <th class="{thClass} text-right" onclick={() => onsort('amount')}>Monto{arrow('amount')}</th>
             <th class={thClass} onclick={() => onsort('reference')}>Referencia{arrow('reference')}</th>
             <th class={thClass} onclick={() => onsort('status')}>Estado{arrow('status')}</th>
-            <th class="{thClass} cursor-default hover:text-gray-500">Detalle</th>
           </tr>
         </thead>
         <tbody>
@@ -95,7 +95,10 @@
             <tr class="border-b border-white/[0.03] hover:bg-white/[0.03] transition-colors group">
               <td class="px-4 py-3.5 text-gray-600 text-xs font-mono">{idx}</td>
               <td class="px-4 py-3.5 text-gray-300 whitespace-nowrap text-xs">{t.date_formatted}</td>
-              <td class="px-4 py-3.5 text-gray-200 max-w-[220px] truncate">{t.subject}</td>
+              <td class="px-4 py-3.5 max-w-[220px] overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-700 group-hover:text-gray-400 transition-colors">
+                {t.snippet}
+              </td>
+              <td class="px-4 py-3.5 text-gray-200">{t.subject}</td>
               <td class="px-4 py-3.5 text-right font-semibold font-mono text-emerald-400">
                 {t.amount !== null ? '$' + fmtNum(t.amount) : '—'}
               </td>
@@ -105,9 +108,6 @@
                   class="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium text-white shadow-sm"
                   style="background: {STATUS_COLORS[t.status] || '#7f8c8d'}"
                 >{t.status}</span>
-              </td>
-              <td class="px-4 py-3.5 max-w-[220px] overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-700 group-hover:text-gray-400 transition-colors">
-                {t.snippet}
               </td>
             </tr>
           {/each}

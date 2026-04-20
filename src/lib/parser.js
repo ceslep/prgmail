@@ -99,11 +99,23 @@ export function parseAmount(text) {
   let cleaned = raw.replace(/[A-Za-z$\s]/g, '')
 
   if (cleaned.includes(',') && cleaned.includes('.')) {
+    // Both separators present: last one is decimal
     if (cleaned.lastIndexOf(',') > cleaned.lastIndexOf('.')) {
+      // 1.234,56 → European/Colombian style
       cleaned = cleaned.replace(/\./g, '').replace(',', '.')
     } else {
+      // 1,234.56 → US style
       cleaned = cleaned.replace(/,/g, '')
     }
+  } else if (cleaned.includes('.')) {
+    // Only dots: check if used as thousand separator (e.g., 300.000 or 1.234.567)
+    const dotParts = cleaned.split('.')
+    const allGroupsOf3 = dotParts.slice(1).every(p => p.length === 3)
+    if (dotParts.length > 2 || (dotParts.length === 2 && allGroupsOf3 && dotParts[1].length === 3)) {
+      // Dots are thousand separators
+      cleaned = cleaned.replace(/\./g, '')
+    }
+    // else: single dot with non-3 decimals → treat as decimal point (e.g., 300000.50)
   } else if (cleaned.includes(',')) {
     const parts = cleaned.split(',')
     if (parts.length === 2 && parts[1].length === 2) {
